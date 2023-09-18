@@ -1,4 +1,4 @@
-# Install script for directory: /Users/zakerden1234/Desktop/Hm1PP
+# Install script for directory: /Users/zakerden1234/Desktop/Simple-Text-Editor-the-basics-of-procedural-and-structural-programming/Hm1PP
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/zakerden1234/Desktop/Hm1PP/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/zakerden1234/Desktop/Simple-Text-Editor-the-basics-of-procedural-and-structural-programming/Hm1PP/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
