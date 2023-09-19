@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(){
+int main()
+{
     int command = 0;
 
     char** Array = NULL;
@@ -15,20 +16,22 @@ int main(){
         printf("Write command 1-5:");
         scanf("%d", &command);
 
+        while (getchar() != '\n');
+
         if (command == 1)
         {
             char buffer[400];
             printf("Write text to append:");
-            scanf(" %[^\n]", buffer);
+            scanf("%[^\n]", buffer);
 
-            if (ArrayLines == 0) {
-                // Якщо це перший рядок, виділимо пам'ять та скопіюємо введений текст
+            if (ArrayLines == 0)
+            {
                 Array = (char**)malloc(sizeof(char*));
                 Array[ArrayLines] = (char*)malloc((strlen(buffer) + 1) * sizeof(char));
                 strcpy(Array[ArrayLines], buffer);
                 ArrayLines++;
-            } else {
-                // Якщо не перший рядок, збільшимо розмір попереднього рядка та додамо введений текст
+            } else
+            {
                 Array[ArrayLines - 1] = (char*)realloc(Array[ArrayLines - 1], (strlen(Array[ArrayLines - 1]) + strlen(buffer) + 1) * sizeof(char));
                 strcat(Array[ArrayLines - 1], buffer);
             }
@@ -53,7 +56,7 @@ int main(){
         if (command == 4)
         {
             printf("Write file name to SAVE:");
-            scanf("%s", &FileName);
+            scanf("%s", FileName);
 
             FILE* file = fopen(FileName, "w");
             if (file != NULL)
@@ -63,7 +66,7 @@ int main(){
                     fprintf(file, "%s\n", Array[i]);
                 }
                 fclose(file);
-                printf("Array saved to %s \n", FileName);
+                printf("Array saved to %s\n", FileName);
             }
             else
             {
@@ -74,30 +77,80 @@ int main(){
         if (command == 5)
         {
             printf("Write file name to LOAD:");
-            scanf("%s", &FileName);
+            scanf("%s", FileName);
 
             FILE* file = fopen(FileName, "r");
-            if (file != NULL) {
+            if (file != NULL)
+            {
                 char line[400];
                 while (fgets(line, sizeof(line), file) != NULL)
                 {
-                    line[strlen(line) - 1] = '\0'; // Видаляємо символ нового рядка з кінця рядка
+                    line[strlen(line) - 1] = '\0';
                     ArrayLines++;
                     Array = (char**)realloc(Array, ArrayLines * sizeof(char*));
                     Array[ArrayLines - 1] = (char*)malloc((strlen(line) + 1) * sizeof(char));
                     strcpy(Array[ArrayLines - 1], line);
                 }
                 fclose(file);
-                printf("Array loaded from %s \n", FileName);
-
-            } else {
+                printf("Array loaded from %s\n", FileName);
+            }
+            else
+            {
                 printf("Error opening the file.\n");
             }
         }
 
-        if (command < 0 || command > 8)
+        if (command == 6)
         {
-            printf("The command is not implemented. \n");
+            char substring[100];
+            printf("Enter the substring to search for: ");
+            scanf("%s", substring);
+            int found = 0;
+
+            for (int i = 0; i < ArrayLines; i++)
+            {
+                char* line = Array[i];
+                int position = -1;
+                int first_letter_pos = -1;
+                int last_letter_pos = -1;
+                int substring_index = 0;
+
+                for (int j = 0; j < strlen(line); j++)
+                {
+                    if (line[j] == substring[substring_index])
+                    {
+                        if (first_letter_pos == -1)
+                        {
+                            first_letter_pos = j;
+                        }
+                        last_letter_pos = j;
+                        substring_index++;
+
+                        if (substring_index == strlen(substring))
+                        {
+                            position = first_letter_pos;
+                            printf("Word found in line %d, positions %d to %d: %s\n", i + 1, position + 1, last_letter_pos + 1, substring);
+                            found = 1;
+                            substring_index = 0;
+                            first_letter_pos = -1;
+                        }
+                    }
+                    else
+                    {
+                        substring_index = 0;
+                        first_letter_pos = -1;
+                        last_letter_pos = -1;
+                    }
+                }
+            }
+
+            if (!found) {
+                printf("Substring not found in any line.\n");
+            }
+        }
+
+        if (command < 0 || command > 7) {
+            printf("The command is not implemented.\n");
         }
     }
     return 0;
