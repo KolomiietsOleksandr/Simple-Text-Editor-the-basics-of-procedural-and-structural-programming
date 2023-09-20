@@ -13,7 +13,7 @@ int main()
 
     while (1)
     {
-        printf("Write command 1-5:");
+        printf("Write command 1-7:");
         scanf("%d", &command);
 
         while (getchar() != '\n');
@@ -147,6 +147,50 @@ int main()
             if (!found) {
                 printf("Substring not found in any line.\n");
             }
+        }
+
+        if (command == 7) {
+            int line_index, position;
+            char substring[100];
+
+            printf("Enter line index for insertion: ");
+            scanf("%d", &line_index);
+
+            if (line_index < 1 || line_index > ArrayLines) {
+                printf("Invalid line index.\n");
+                continue;
+            }
+
+            printf("Enter position for insertion (0-%d): ", strlen(Array[line_index - 1]));
+            scanf("%d", &position);
+
+            if (position < 0 || position > strlen(Array[line_index - 1])) {
+                printf("Invalid position.\n");
+                continue;
+            }
+
+            printf("Enter substring to insert: ");
+            scanf("%s", substring);
+
+            int new_length = strlen(Array[line_index - 1]) + strlen(substring) + 1;
+            Array[line_index - 1] = (char*)realloc(Array[line_index - 1], new_length * sizeof(char));
+
+            char* temp = (char*)malloc(new_length * sizeof(char));
+            strcpy(temp, Array[line_index - 1]);
+
+            for (int i = 0; i < position; i++) {
+                Array[line_index - 1][i] = temp[i];
+            }
+
+            for (int i = 0; i < strlen(substring); i++) {
+                Array[line_index - 1][position + i] = substring[i];
+            }
+
+            for (int i = position; i < strlen(temp); i++) {
+                Array[line_index - 1][position + strlen(substring) + i] = temp[i];
+            }
+
+            free(temp);
         }
 
         if (command < 0 || command > 7) {
