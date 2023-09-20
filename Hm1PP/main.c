@@ -41,7 +41,8 @@ void loadFromFile(char*** Array, int* ArrayLines, char* FileName) {
     FILE* file = fopen(FileName, "r");
     if (file != NULL) {
         char line[400];
-        while (fgets(line, sizeof(line), file) != NULL) {
+        while (fgets(line, sizeof(line), file) != NULL)
+        {
             line[strlen(line) - 1] = '\0';
             (*ArrayLines)++;
             (*Array) = (char**)realloc((*Array), (*ArrayLines) * sizeof(char*));
@@ -55,44 +56,56 @@ void loadFromFile(char*** Array, int* ArrayLines, char* FileName) {
     }
 }
 
-// Функція для пошуку та виведення підрядка в рядку
-void searchSubstring(char** Array, int ArrayLines, char* substring) {
+// Функція для пошуку та виведення підрядка в рядку із зазначенням індексу рядка
+void searchSubstringInLine(char* line, int line_index, char* substring) {
+    int found = 0;
+    int position = -1;
+    int first_letter_pos = -1;
+    int last_letter_pos = -1;
+    int substring_index = 0;
+
+    for (int j = 0; j < strlen(line); j++) {
+        if (line[j] == substring[substring_index]) {
+            if (first_letter_pos == -1) {
+                first_letter_pos = j;
+            }
+            last_letter_pos = j;
+            substring_index++;
+
+            if (substring_index == strlen(substring)) {
+                position = first_letter_pos;
+                printf("Word found in line %d, positions %d to %d: %s\n", line_index, position + 1, last_letter_pos + 1, substring);
+                found = 1;
+                substring_index = 0;
+                first_letter_pos = -1;
+            }
+        } else {
+            substring_index = 0;
+            first_letter_pos = -1;
+            last_letter_pos = -1;
+        }
+    }
+
+    if (!found) {
+        printf("Substring not found in line %d.\n", line_index);
+    }
+}
+
+// Функція для пошуку тексту в масиві рядків
+void searchSubstringInArray(char** Array, int ArrayLines, char* substring) {
     int found = 0;
 
     for (int i = 0; i < ArrayLines; i++) {
         char* line = Array[i];
-        int position = -1;
-        int first_letter_pos = -1;
-        int last_letter_pos = -1;
-        int substring_index = 0;
-
-        for (int j = 0; j < strlen(line); j++) {
-            if (line[j] == substring[substring_index]) {
-                if (first_letter_pos == -1) {
-                    first_letter_pos = j;
-                }
-                last_letter_pos = j;
-                substring_index++;
-
-                if (substring_index == strlen(substring)) {
-                    position = first_letter_pos;
-                    printf("Word found in line %d, positions %d to %d: %s\n", i + 1, position + 1, last_letter_pos + 1, substring);
-                    found = 1;
-                    substring_index = 0;
-                    first_letter_pos = -1;
-                }
-            } else {
-                substring_index = 0;
-                first_letter_pos = -1;
-                last_letter_pos = -1;
-            }
-        }
+        searchSubstringInLine(line, i + 1, substring);
+        found = 1;
     }
 
     if (!found) {
         printf("Substring not found in any line.\n");
     }
 }
+
 
 // Функція для вставки підрядка в рядок за індексом та позицією
 void insertSubstring(char*** Array, int ArrayLines, int line_index, int position, char* substring) {
@@ -106,26 +119,18 @@ void insertSubstring(char*** Array, int ArrayLines, int line_index, int position
         return;
     }
 
-    int new_length = strlen((*Array)[line_index - 1]) + strlen(substring) + 1;
+    int original_length = strlen((*Array)[line_index - 1]);
+    int new_length = original_length + strlen(substring) + 1;
+
+    int remaining_length = original_length - position;
+
     (*Array)[line_index - 1] = (char*)realloc((*Array)[line_index - 1], new_length * sizeof(char));
 
-    char* temp = (char*)malloc(new_length * sizeof(char));
-    strcpy(temp, (*Array)[line_index - 1]);
+    memmove((*Array)[line_index - 1] + position + strlen(substring), (*Array)[line_index - 1] + position, remaining_length);
 
-    for (int i = 0; i < position; i++) {
-        (*Array)[line_index - 1][i] = temp[i];
-    }
-
-    for (int i = 0; i < strlen(substring); i++) {
-        (*Array)[line_index - 1][position + i] = substring[i];
-    }
-
-    for (int i = position; i < strlen(temp); i++) {
-        (*Array)[line_index - 1][position + strlen(substring) + i] = temp[i];
-    }
-
-    free(temp);
+    strncpy((*Array)[line_index - 1] + position, substring, strlen(substring));
 }
+
 
 int main() {
     int command = 0;
@@ -176,7 +181,7 @@ int main() {
                 char substring[100];
                 printf("Enter the substring to search for: ");
                 scanf("%s", substring);
-                searchSubstring(Array, ArrayLines, substring);
+                searchSubstringInArray(Array, ArrayLines, substring);
                 break;
             }
             case 7: {
@@ -195,8 +200,13 @@ int main() {
                 insertSubstring(&Array, ArrayLines, line_index, position, substring);
                 break;
             }
+
+            case 8: {
+                system("clear");
+            }
+
             default: {
-                if (command < 0 || command > 7) {
+                if (command < 0 || command > 8) {
                     printf("The command is not implemented.\n");
                 }
                 break;
