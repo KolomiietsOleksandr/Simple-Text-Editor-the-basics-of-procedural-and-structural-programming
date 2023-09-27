@@ -195,11 +195,14 @@ int main() {
                 scanf("%d", &position);
 
                 printf("Enter substring to insert: ");
-                scanf("%s", substring);
+                while (getchar() != '\n');
+                fgets(substring, sizeof(substring), stdin);
+                substring[strcspn(substring, "\n")] = '\0';
 
                 insertSubstring(&Array, ArrayLines, line_index, position, substring);
                 break;
             }
+
 
             case 8: {
                 system("clear");
